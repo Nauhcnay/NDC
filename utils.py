@@ -98,7 +98,8 @@ def read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
 
 def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True):
     # chuan's change
-    grid_size_z = 50
+    # grid_size_z = 50
+    grid_size_z = grid_size+1
     grid_size_1 = grid_size+1
 
 
