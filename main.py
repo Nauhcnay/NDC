@@ -138,8 +138,8 @@ if is_training:
     elif FLAGS.input_type == "pointcloud" or FLAGS.input_type == "noisypc":
         dataset_train = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=True, out_bool=net_bool, out_float=net_float)
         dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True)
-    dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=1, shuffle=True, num_workers=16, worker_init_fn=worker_init_fn) #batch_size must be 1
-    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=16)  #batch_size must be 1
+    dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=1, shuffle=True, num_workers=0, worker_init_fn=worker_init_fn) #batch_size must be 1
+    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0)  #batch_size must be 1
 
 
     if net_bool:
@@ -376,7 +376,7 @@ elif is_testing:
             dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True, input_only=True)
         else:
             dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True)
-    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=16)  #batch_size must be 1
+    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0)  #batch_size must be 1
 
 
     #load weights
