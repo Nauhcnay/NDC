@@ -343,16 +343,22 @@ def postprocessing(pred_output_bool):
         #open edges
         gridedge_x_outedge_y_0 = pred_output_bool[:-1, :,   :-1, 0]
         gridedge_x_outedge_y_1 = pred_output_bool[:-1, :,   1: , 0]
+
         gridedge_x_outedge_z_0 = pred_output_bool[:-1, :-1, :  , 0]
         gridedge_x_outedge_z_1 = pred_output_bool[:-1, 1:,  :  , 0]
+        
         gridedge_y_outedge_x_0 = pred_output_bool[:,   :-1, :-1, 1]
         gridedge_y_outedge_x_1 = pred_output_bool[:,   :-1, 1: , 1]
+        
         gridedge_y_outedge_z_0 = pred_output_bool[:-1, :-1, :  , 1]
         gridedge_y_outedge_z_1 = pred_output_bool[1:,  :-1, :  , 1]
+        
         gridedge_z_outedge_x_0 = pred_output_bool[:,   :-1, :-1, 2]
         gridedge_z_outedge_x_1 = pred_output_bool[:,   1:,  :-1, 2]
+        
         gridedge_z_outedge_y_0 = pred_output_bool[:-1, :,   :-1, 2]
         gridedge_z_outedge_y_1 = pred_output_bool[1:,  :,   :-1, 2]
+        
         outedge_x = gridedge_y_outedge_x_0+gridedge_y_outedge_x_1+gridedge_z_outedge_x_0+gridedge_z_outedge_x_1
         outedge_y = gridedge_x_outedge_y_0+gridedge_x_outedge_y_1+gridedge_z_outedge_y_0+gridedge_z_outedge_y_1
         outedge_z = gridedge_x_outedge_z_0+gridedge_x_outedge_z_1+gridedge_y_outedge_z_0+gridedge_y_outedge_z_1
