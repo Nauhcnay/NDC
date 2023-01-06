@@ -7,6 +7,8 @@ import torch
 
 from utils import read_data,read_and_augment_data_ndc,read_and_augment_data_undc,read_data_input_only, read_sdf_file_as_3d_array,read_binvox_file_as_3d_array
 
+CHUAN = True
+
 class ABC_grid_hdf5(torch.utils.data.Dataset):
     def __init__(self, data_dir, output_grid_size, receptive_padding, input_type, train, out_bool, out_float, is_undc, input_only=False):
         self.data_dir = data_dir
@@ -42,20 +44,25 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
         #remove empty
         temp_hdf5_names = []
         temp_hdf5_gridsizes = []
+        if CHUAN:
+            size_list = [256]
+        else:
+            size_list = [32, 64]
         if self.train:
             if (not self.is_undc) and self.out_float:
                 for name in self.hdf5_names:
                     hdf5_file = h5py.File(self.data_dir+"/"+name+".hdf5", 'r')
-                    for grid_size in [32,64]:
-                    # for grid_size in [256]:
+                    
+                    # for grid_size in [32,64]:
+                    for grid_size in size_list:
                         float_grid = hdf5_file[str(grid_size)+"_float"][:]
                         if np.any(float_grid>=0):
                             temp_hdf5_names.append(name)
                             temp_hdf5_gridsizes.append(grid_size)
             else:
                 for name in self.hdf5_names:
-                    for grid_size in [32,64]:
-                    # for grid_size in [256]:
+                    # for grid_size in [32,64]:
+                    for grid_size in size_list:
                         temp_hdf5_names.append(name)
                         temp_hdf5_gridsizes.append(grid_size)
         else:
@@ -131,6 +138,12 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
 
         gt_input_ = np.expand_dims(gt_input_, axis=0).astype(np.float32)
 
+        if CHUAN:
+            _, grid_size_x, grid_size_y, grid_size_z = gt_input_.shape
+        else:
+            grid_size_x = grid_size + 1
+            grid_size_y = grid_size + 1
+            grid_size_z = grid_size + 1
         #crop to save space & time
         #get bounding box
         if self.train:
@@ -145,7 +158,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
             ray = np.max(valid_flag,(1,2))
             xmin = -1
             xmax = -1
-            for i in range(grid_size+1):
+            for i in range(grid_size_x):
                 if ray[i]>0:
                     if xmin==-1:
                         xmin = i
@@ -154,7 +167,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
             ray = np.max(valid_flag,(0,2))
             ymin = -1
             ymax = -1
-            for i in range(grid_size+1):
+            for i in range(grid_size_y):
                 if ray[i]>0:
                     if ymin==-1:
                         ymin = i
@@ -163,7 +176,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
             ray = np.max(valid_flag,(0,1))
             zmin = -1
             zmax = -1
-            for i in range(grid_size+1):
+            for i in range(grid_size_z):
                 if ray[i]>0:
                     if zmin==-1:
                         zmin = i
@@ -215,21 +228,21 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
         if xmin<0:
             xmin_pad -= xmin
             xmin = 0
-        if xmax>grid_size+1:
-            xmax_pad += (grid_size+1-xmax)
-            xmax=grid_size+1
+        if xmax>grid_size_x:
+            xmax_pad += (grid_size_x-xmax)
+            xmax=grid_size_x
         if ymin<0:
             ymin_pad -= ymin
             ymin = 0
-        if ymax>grid_size+1:
-            ymax_pad += (grid_size+1-ymax)
-            ymax=grid_size+1
+        if ymax>grid_size_y:
+            ymax_pad += (grid_size_y-ymax)
+            ymax=grid_size_y
         if zmin<0:
             zmin_pad -= zmin
             zmin = 0
-        if zmax>grid_size+1:
-            zmax_pad += (grid_size+1-zmax)
-            zmax=grid_size+1
+        if zmax>grid_size_z:
+            zmax_pad += (grid_size_z-zmax)
+            zmax=grid_size_z
 
         gt_input[:,xmin_pad:xmax_pad,ymin_pad:ymax_pad,zmin_pad:zmax_pad] = gt_input_[:,xmin:xmax,ymin:ymax,zmin:zmax]
 

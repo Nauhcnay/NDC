@@ -1,6 +1,7 @@
 import numpy as np
 import h5py
 
+CHUAN = True
 
 #read sdf files produced by SDFGen
 def read_sdf_file_as_3d_array(name):
@@ -98,8 +99,10 @@ def read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
 
 def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True):
     # chuan's change
-    # grid_size_z = 50
-    grid_size_z = grid_size+1
+    if CHUAN:
+        grid_size_z = 51
+    else:
+        grid_size_z = grid_size+1
     grid_size_1 = grid_size+1
 
 
@@ -236,9 +239,11 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
 
 def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True):
     # chuan's modification
-    # grid_size_z = 50
+    if CHUAN:
+        grid_size_z = 51
+    else:
+        grid_size_z = grid_size+1
     
-    grid_size_z = grid_size+1
     grid_size_1 = grid_size+1
 
     #read input hdf5
