@@ -97,7 +97,10 @@ def read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
 
 
 def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True):
+    # chuan's change
+    grid_size_z = 50
     grid_size_1 = grid_size+1
+
 
     #read input hdf5
     LOD_gt_int, LOD_gt_float, LOD_input = read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc=False)
@@ -199,7 +202,7 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
 
     #store outputs
     if out_bool:
-        LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_1,1], np.int32)
+        LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_z,1], np.int32)
         if inversion_flag:
             LOD_gt_int[:,:,:,0] = 1-newdict['int_V_signs']
         else:
@@ -208,7 +211,7 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
         LOD_gt_int = None
 
     if out_float:
-        LOD_gt_float = np.full([grid_size_1,grid_size_1,grid_size_1,3], -1, np.float32)
+        LOD_gt_float = np.full([grid_size_1,grid_size_1,grid_size_z,3], -1, np.float32)
         LOD_gt_float[:-1,:-1,:-1,0] = newdict['float_center_x_']
         LOD_gt_float[:-1,:-1,:-1,1] = newdict['float_center_y_']
         LOD_gt_float[:-1,:-1,:-1,2] = newdict['float_center_z_']
@@ -216,13 +219,13 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
         LOD_gt_float = None
 
     if input_type=="sdf" or input_type=="udf":
-        LOD_input = np.ones([grid_size_1,grid_size_1,grid_size_1], np.float32)
+        LOD_input = np.ones([grid_size_1,grid_size_1,grid_size_z], np.float32)
         LOD_input[:,:,:] = newdict['input_sdf']
         if inversion_flag:
             LOD_input = -LOD_input
 
     elif input_type=="voxel":
-        LOD_input = np.zeros([grid_size_1,grid_size_1,grid_size_1], np.uint8)
+        LOD_input = np.zeros([grid_size_1,grid_size_1,grid_size_z], np.uint8)
         LOD_input[:-1,:-1,:-1] = newdict['input_voxel']
         if inversion_flag:
             LOD_input = 1-LOD_input
@@ -231,6 +234,7 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
 
 
 def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True):
+    grid_size_z = 50
     grid_size_1 = grid_size+1
 
     #read input hdf5
@@ -392,7 +396,15 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
 
     #store outputs
     if out_bool:
-        LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_1,3], np.int32)
+        # chuan's modification
+        pm = permutation + [3]
+        idx = np.array(pm)
+        grid_size_old = np.array([grid_size_1,grid_size_1,grid_size_z,3])
+        grid_size_new = grid_size_old[pm]
+        LOD_gt_int = np.zeros(grid_size_new, np.int32)
+        # modification end
+
+        # LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_1,3], np.int32)
         LOD_gt_int[:-1,:,:,0] = newdict['int_edge_x_']
         LOD_gt_int[:,:-1,:,1] = newdict['int_edge_y_']
         LOD_gt_int[:,:,:-1,2] = newdict['int_edge_z_']
@@ -400,7 +412,7 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
         LOD_gt_int = None
 
     if out_float:
-        LOD_gt_float = np.full([grid_size_1,grid_size_1,grid_size_1,3], -1, np.float32)
+        LOD_gt_float = np.full([grid_size_1,grid_size_1,grid_size_z,3], -1, np.float32)
         LOD_gt_float[:-1,:-1,:-1,0] = newdict['float_center_x_']
         LOD_gt_float[:-1,:-1,:-1,1] = newdict['float_center_y_']
         LOD_gt_float[:-1,:-1,:-1,2] = newdict['float_center_z_']
@@ -408,13 +420,20 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
         LOD_gt_float = None
 
     if input_type=="sdf" or input_type=="udf":
-        LOD_input = np.ones([grid_size_1,grid_size_1,grid_size_1], np.float32)
+        # chuan's modification
+        idx = np.array(permutation)
+        grid_size_old = np.array([grid_size_1,grid_size_1,grid_size_z])
+        grid_size_new = grid_size_old[permutation]
+        LOD_input = np.zeros(grid_size_new, np.int32)
+        # modification end
+
+        # LOD_input = np.ones([grid_size_1,grid_size_1,grid_size_z], np.float32)
         LOD_input[:,:,:] = newdict['input_sdf']
         if inversion_flag:
             LOD_input = -LOD_input
 
     elif input_type=="voxel":
-        LOD_input = np.zeros([grid_size_1,grid_size_1,grid_size_1], np.uint8)
+        LOD_input = np.zeros([grid_size_1,grid_size_1,grid_size_z], np.uint8)
         LOD_input[:-1,:-1,:-1] = newdict['input_voxel']
         if inversion_flag:
             LOD_input = 1-LOD_input

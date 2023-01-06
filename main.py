@@ -138,8 +138,8 @@ if is_training:
     elif FLAGS.input_type == "pointcloud" or FLAGS.input_type == "noisypc":
         dataset_train = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=True, out_bool=net_bool, out_float=net_float)
         dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True)
-    dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=1, shuffle=True, num_workers=16, worker_init_fn=worker_init_fn) #batch_size must be 1
-    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=16)  #batch_size must be 1
+    dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=1, shuffle=True, num_workers=0, worker_init_fn=worker_init_fn) #batch_size must be 1
+    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0)  #batch_size must be 1
 
 
     if net_bool:
@@ -376,7 +376,7 @@ elif is_testing:
             dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True, input_only=True)
         else:
             dataset_test = datasetpc.ABC_pointcloud_hdf5(FLAGS.data_dir, FLAGS.point_num, FLAGS.grid_size, KNN_num, pooling_radius, FLAGS.input_type, train=False, out_bool=True, out_float=True)
-    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=16)  #batch_size must be 1
+    dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0)  #batch_size must be 1
 
 
     #load weights
@@ -514,7 +514,7 @@ elif quick_testing:
     if FLAGS.input_type == "sdf" or FLAGS.input_type == "voxel" or FLAGS.input_type == "udf":
         #Create test dataset
         dataset_test = dataset.single_shape_grid(FLAGS.test_input, receptive_padding, FLAGS.input_type, is_undc=(FLAGS.method == "undc"))
-        dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=1)  #batch_size must be 1
+        dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=1, shuffle=False, num_workers=0)  #batch_size must be 1
 
         for i, data in enumerate(dataloader_test, 0):
 
@@ -524,17 +524,40 @@ elif quick_testing:
             if FLAGS.method == "undc":
                 gt_output_bool_mask = gt_output_bool_mask_.to(device)
 
+            '''
+            Chuan's code
+            '''
+            fake_input = False
+            fake_output = False
+            sketch = np.load('test_03.npz')
+            gt_input = np.tile(sketch['udf'], (50, 1, 1))
+            y, x = sketch['edge_x'].shape
+            gt_output = np.zeros((1, 3, x - 6, y - 6, 50 - 6))
+            x_bool = np.expand_dims(sketch['edge_x'].transpose((1, 0))[3:-3, 3:-3], axis = (0, 1, -1))
+            y_bool = np.expand_dims(sketch['edge_y'].transpose((1, 0))[3:-3, 3:-3], axis = (0, 1, -1))
+            gt_output[:,0,:,:,:] = x_bool
+            gt_output[:,1,:,:,:] = y_bool
+            gt_output = torch.Tensor(gt_output).to(device)
+            # z, y, x
+            if fake_input:
+                gt_input = torch.Tensor(gt_input).permute(2, 1, 0).to(device).unsqueeze(0).unsqueeze(0)
+            
+            '''
+            Chuan's code end
+            '''
+
             with torch.no_grad():
                 if net_bool:
                     pred_output_bool = network_bool(gt_input)
                 if net_float:
                     pred_output_float = network_float(gt_input)
-
                 if net_bool:
-
                     if FLAGS.method == "undc":
                         if FLAGS.input_type == "sdf" or FLAGS.input_type == "udf":
-                            pred_output_bool = ( pred_output_bool[0] > 0.5 ).int()
+                            if fake_output:
+                                pred_output_bool = (gt_output[0] > 0.5 ).int()
+                            else:
+                                pred_output_bool = ( pred_output_bool[0] > 0.5 ).int()
                         if FLAGS.input_type == "voxel":
                             pred_output_bool = ( pred_output_bool[0]*gt_output_bool_mask[0] > 0.5 ).int()
                         pred_output_bool = pred_output_bool.permute(1,2,3,0)
