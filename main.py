@@ -527,7 +527,7 @@ elif quick_testing:
             '''
             Chuan's code
             '''
-            fake_input = False
+            fake_input = True
             fake_output = False
             if fake_input:
                 sketch = np.load('test_03.npz')

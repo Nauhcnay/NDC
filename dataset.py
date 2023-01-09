@@ -7,7 +7,7 @@ import torch
 
 from utils import read_data,read_and_augment_data_ndc,read_and_augment_data_undc,read_data_input_only, read_sdf_file_as_3d_array,read_binvox_file_as_3d_array
 
-CHUAN = False
+CHUAN = True
 
 class ABC_grid_hdf5(torch.utils.data.Dataset):
     def __init__(self, data_dir, output_grid_size, receptive_padding, input_type, train, out_bool, out_float, is_undc, input_only=False):
@@ -46,6 +46,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
         temp_hdf5_gridsizes = []
         if CHUAN:
             size_list = [256]
+            self.output_grid_size = 256
         else:
             size_list = [32, 64]
         if self.train:

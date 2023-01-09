@@ -1,7 +1,7 @@
 import numpy as np
 import h5py
 
-CHUAN = False
+CHUAN = True
 
 #read sdf files produced by SDFGen
 def read_sdf_file_as_3d_array(name):
@@ -51,16 +51,22 @@ def read_binvox_file_as_3d_array(name,fix_coords=True):
 
 
 def read_data_input_only(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
+    if CHUAN:
+        grid_size_z = 51
+    else:
+        grid_size_z = grid_size+1
+    grid_size_1 = grid_size+1
+
     hdf5_file = h5py.File(hdf5_dir, 'r')
     if out_bool:
         if is_undc:
-            LOD_gt_int = np.zeros([grid_size+1,grid_size+1,grid_size+1,3],np.int32)
+            LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_z,3],np.int32)
         else:
-            LOD_gt_int = np.zeros([grid_size+1,grid_size+1,grid_size+1,1],np.int32)
+            LOD_gt_int = np.zeros([grid_size_1,grid_size_1,grid_size_z,1],np.int32)
     else:
         LOD_gt_int = None
     if out_float:
-        LOD_gt_float = np.zeros([grid_size+1,grid_size+1,grid_size+1,3],np.float32)
+        LOD_gt_float = np.zeros([grid_size_1,grid_size_1,grid_size_z,3],np.float32)
     else:
         LOD_gt_float = None
     if input_type=="sdf" or input_type=="udf":
