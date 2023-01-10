@@ -439,7 +439,7 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
         idx = np.array(permutation)
         grid_size_old = np.array([grid_size_1,grid_size_1,grid_size_z])
         grid_size_new = grid_size_old[permutation]
-        LOD_input = np.zeros(grid_size_new, np.int32)
+        LOD_input = np.zeros(grid_size_new, np.float32)
         # modification end
 
         # LOD_input = np.ones([grid_size_1,grid_size_1,grid_size_z], np.float32)
