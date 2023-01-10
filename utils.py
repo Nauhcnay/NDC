@@ -1,7 +1,7 @@
 import numpy as np
 import h5py
 
-CHUAN = False
+CHUAN = True
 
 #read sdf files produced by SDFGen
 def read_sdf_file_as_3d_array(name):
@@ -82,24 +82,30 @@ def read_data_input_only(hdf5_dir,grid_size,input_type,out_bool,out_float,is_und
 
 
 def read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
-    hdf5_file = h5py.File(hdf5_dir, 'r')
-    if out_bool:
-        LOD_gt_int = hdf5_file[str(grid_size)+"_int"][:].astype(np.int32)
-    else:
-        LOD_gt_int = None
-    if out_float:
-        LOD_gt_float = hdf5_file[str(grid_size)+"_float"][:].astype(np.float32)
-    else:
-        LOD_gt_float = None
-    if input_type=="sdf" or input_type=="udf":
-        LOD_input = hdf5_file[str(grid_size)+"_sdf"][:]
-        LOD_input = LOD_input*grid_size #denormalize
-    elif input_type=="voxel":
-        LOD_input = hdf5_file[str(grid_size)+"_voxel"][:]
-    elif input_type=="pointcloud" or input_type=="noisypc":
-        LOD_input = hdf5_file["pointcloud"][:].astype(np.float32)
-        LOD_input = (LOD_input+0.5)*grid_size #denormalize
-    hdf5_file.close()
+    try:
+        hdf5_file = h5py.File(hdf5_dir, 'r')
+        if out_bool:
+            LOD_gt_int = hdf5_file[str(grid_size)+"_int"][:].astype(np.int32)
+        else:
+            LOD_gt_int = None
+        if out_float:
+            LOD_gt_float = hdf5_file[str(grid_size)+"_float"][:].astype(np.float32)
+        else:
+            LOD_gt_float = None
+        if input_type=="sdf" or input_type=="udf":
+            LOD_input = hdf5_file[str(grid_size)+"_sdf"][:]
+            LOD_input = LOD_input*grid_size #denormalize
+        elif input_type=="voxel":
+            LOD_input = hdf5_file[str(grid_size)+"_voxel"][:]
+        elif input_type=="pointcloud" or input_type=="noisypc":
+            LOD_input = hdf5_file["pointcloud"][:].astype(np.float32)
+            LOD_input = (LOD_input+0.5)*grid_size #denormalize
+        hdf5_file.close()
+    except:
+        print("Log:\tinvalide input %s"%hdf5_dir)
+        LOD_gt_int = 0
+        LOD_gt_float = 0
+        LOD_input = 0
     return LOD_gt_int, LOD_gt_float, LOD_input
 
 
@@ -114,6 +120,7 @@ def read_and_augment_data_ndc(hdf5_dir,grid_size,input_type,out_bool,out_float,a
 
     #read input hdf5
     LOD_gt_int, LOD_gt_float, LOD_input = read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc=False)
+    # return None, None, None
 
     newdict = {}
 
@@ -254,6 +261,7 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
 
     #read input hdf5
     LOD_gt_int, LOD_gt_float, LOD_input = read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc=True)
+    # return None, None, None
 
     newdict = {} #store grid
     newpcdict = {} #store pointcloud

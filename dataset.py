@@ -7,7 +7,7 @@ import torch
 
 from utils import read_data,read_and_augment_data_ndc,read_and_augment_data_undc,read_data_input_only, read_sdf_file_as_3d_array,read_binvox_file_as_3d_array
 
-CHUAN = False
+CHUAN = True
 
 class ABC_grid_hdf5(torch.utils.data.Dataset):
     def __init__(self, data_dir, output_grid_size, receptive_padding, input_type, train, out_bool, out_float, is_undc, input_only=False):
@@ -91,6 +91,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
             elif self.input_type=="sdf" or self.input_type=="udf":
                 if self.is_undc:
                     gt_output_bool_,gt_output_float_,gt_input_ = read_and_augment_data_undc(hdf5_dir,grid_size,self.input_type,self.out_bool,self.out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True)
+                    # return 0, 0, 0
                 else:
                     gt_output_bool_,gt_output_float_,gt_input_ = read_and_augment_data_ndc(hdf5_dir,grid_size,self.input_type,self.out_bool,self.out_float,aug_permutation=True,aug_reversal=True,aug_inversion=True)
         else:
