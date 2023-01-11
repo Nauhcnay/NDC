@@ -41,6 +41,7 @@ def get_gt_from_intersectionpn(q, name_list):
     point_sample_num = 65536
 
     grid_size_list = [32,64]
+    # get both label and input SDF
     LOD_gt_int = {}
     LOD_gt_float = {}
     LOD_input_sdf = {}
@@ -54,6 +55,7 @@ def get_gt_from_intersectionpn(q, name_list):
 
 
     for nid in range(name_num):
+        # p, idx, in_name, out_name
         pid = name_list[nid][0]
         idx = name_list[nid][1]
         in_name = name_list[nid][2]
@@ -158,6 +160,7 @@ def get_gt_from_intersectionpn(q, name_list):
                             b[reference_V_len:reference_V_len+3] = reg_pos*reg_scale
                             x = lstsq(a,b)[0]
 
+                            # what is this branch? so no matter what it does, this should relate to the UDF
                             if np.min(x)<0 or np.max(x)>1:
                                 tmp_scale = 1
                                 while np.min(x)<0 or np.max(x)>1:
@@ -304,6 +307,13 @@ if __name__ == '__main__':
         list_of_list_of_names[process_id].append([process_id, idx, in_name, out_name])
 
     
+    '''
+    Chuan: For debug and understanding this code
+    '''
+    get_gt_from_intersectionpn(0, [[0, 0, 'bunny', 'bunny_out']])
+    '''
+    End of Chuan's code
+    '''
     #map processes
     q = Queue()
     workers = []

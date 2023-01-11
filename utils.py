@@ -94,7 +94,9 @@ def read_data(hdf5_dir,grid_size,input_type,out_bool,out_float,is_undc):
             LOD_gt_float = None
         if input_type=="sdf" or input_type=="udf":
             LOD_input = hdf5_file[str(grid_size)+"_sdf"][:]
-            LOD_input = LOD_input*grid_size #denormalize
+            # why times grid_size?
+            if CHUAN == False:
+                LOD_input = LOD_input * grid_size #denormalize
         elif input_type=="voxel":
             LOD_input = hdf5_file[str(grid_size)+"_voxel"][:]
         elif input_type=="pointcloud" or input_type=="noisypc":
