@@ -228,7 +228,7 @@ if __name__ == "__main__":
 
                     if net_bool:
                         gt_input_, gt_output_bool_, gt_output_bool_mask_ = data
-                        tensor_to_png(gt_output_bool_, idx = i, slice_idx = 0, axis = 'x')
+                        # tensor_to_png(gt_output_bool_, idx = i, slice_idx = 0, axis = 'x')
                         gt_input = gt_input_.to(device)
                         gt_output_bool = gt_output_bool_.to(device)
                         gt_output_bool_mask = gt_output_bool_mask_.to(device)
