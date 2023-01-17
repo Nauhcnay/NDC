@@ -1,7 +1,7 @@
 import numpy as np
 import h5py
 
-CHUAN = False
+CHUAN = True
 
 #read sdf files produced by SDFGen
 def read_sdf_file_as_3d_array(name):
