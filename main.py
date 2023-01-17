@@ -336,86 +336,86 @@ if __name__ == "__main__":
                 if net_float:
                     network_float.eval()
 
-                for i, data in enumerate(dataloader_test, 0):
+                # for i, data in enumerate(dataloader_test, 0):
 
-                    if FLAGS.input_type == "sdf" or FLAGS.input_type == "voxel" or FLAGS.input_type == "udf":
+                #     if FLAGS.input_type == "sdf" or FLAGS.input_type == "voxel" or FLAGS.input_type == "udf":
 
-                        gt_input_, gt_output_bool_, gt_output_bool_mask_, gt_output_float_, gt_output_float_mask_ = data
-                        gt_input = gt_input_.to(device)
+                #         gt_input_, gt_output_bool_, gt_output_bool_mask_, gt_output_float_, gt_output_float_mask_ = data
+                #         gt_input = gt_input_.to(device)
 
-                        with torch.no_grad():
-                            if net_bool:
-                                pred_output_bool = network_bool(gt_input)
-                            if net_float:
-                                pred_output_float = network_float(gt_input)
+                #         with torch.no_grad():
+                #             if net_bool:
+                #                 pred_output_bool = network_bool(gt_input)
+                #             if net_float:
+                #                 pred_output_float = network_float(gt_input)
 
-                        if net_bool:
-                            if FLAGS.method == "undc":
-                                pred_output_bool_numpy = np.transpose(pred_output_bool[0].detach().cpu().numpy(), [1,2,3,0])
-                                pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
-                                gt_output_bool_mask_numpy = np.transpose(gt_output_bool_mask_[0].detach().cpu().numpy(), [1,2,3,0]).astype(np.int32)
-                                pred_output_bool_numpy = pred_output_bool_numpy*gt_output_bool_mask_numpy
-                            else:
-                                gt_input_numpy = gt_input_[0,0,receptive_padding:-receptive_padding,receptive_padding:-receptive_padding,receptive_padding:-receptive_padding].detach().cpu().numpy()
-                                if FLAGS.input_type == "voxel":
-                                    pred_output_bool_numpy = np.transpose(pred_output_bool[0].detach().cpu().numpy(), [1,2,3,0])
-                                    pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
-                                    gt_output_bool_mask_numpy = np.transpose(gt_output_bool_mask_[0].detach().cpu().numpy(), [1,2,3,0]).astype(np.int32)
-                                    gt_input_numpy = np.expand_dims(gt_input_numpy.astype(np.int32), axis=3)
-                                    pred_output_bool_numpy = pred_output_bool_numpy*gt_output_bool_mask_numpy + gt_input_numpy*(1-gt_output_bool_mask_numpy)
-                                if FLAGS.input_type == "sdf":
-                                    pred_output_bool_numpy = np.expand_dims((gt_input_numpy<0).astype(np.int32), axis=3)
-                        else:
-                            pred_output_bool_numpy = np.transpose(gt_output_bool_[0].detach().cpu().numpy(), [1,2,3,0])
-                            pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
-                        if net_float:
-                            pred_output_float_numpy = np.transpose(pred_output_float[0].detach().cpu().numpy(), [1,2,3,0])
-                        else:
-                            pred_output_float_numpy = np.transpose(gt_output_float_[0].detach().cpu().numpy(), [1,2,3,0])
+                #         if net_bool:
+                #             if FLAGS.method == "undc":
+                #                 pred_output_bool_numpy = np.transpose(pred_output_bool[0].detach().cpu().numpy(), [1,2,3,0])
+                #                 pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
+                #                 gt_output_bool_mask_numpy = np.transpose(gt_output_bool_mask_[0].detach().cpu().numpy(), [1,2,3,0]).astype(np.int32)
+                #                 pred_output_bool_numpy = pred_output_bool_numpy*gt_output_bool_mask_numpy
+                #             else:
+                #                 gt_input_numpy = gt_input_[0,0,receptive_padding:-receptive_padding,receptive_padding:-receptive_padding,receptive_padding:-receptive_padding].detach().cpu().numpy()
+                #                 if FLAGS.input_type == "voxel":
+                #                     pred_output_bool_numpy = np.transpose(pred_output_bool[0].detach().cpu().numpy(), [1,2,3,0])
+                #                     pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
+                #                     gt_output_bool_mask_numpy = np.transpose(gt_output_bool_mask_[0].detach().cpu().numpy(), [1,2,3,0]).astype(np.int32)
+                #                     gt_input_numpy = np.expand_dims(gt_input_numpy.astype(np.int32), axis=3)
+                #                     pred_output_bool_numpy = pred_output_bool_numpy*gt_output_bool_mask_numpy + gt_input_numpy*(1-gt_output_bool_mask_numpy)
+                #                 if FLAGS.input_type == "sdf":
+                #                     pred_output_bool_numpy = np.expand_dims((gt_input_numpy<0).astype(np.int32), axis=3)
+                #         else:
+                #             pred_output_bool_numpy = np.transpose(gt_output_bool_[0].detach().cpu().numpy(), [1,2,3,0])
+                #             pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
+                #         if net_float:
+                #             pred_output_float_numpy = np.transpose(pred_output_float[0].detach().cpu().numpy(), [1,2,3,0])
+                #         else:
+                #             pred_output_float_numpy = np.transpose(gt_output_float_[0].detach().cpu().numpy(), [1,2,3,0])
 
-                    elif FLAGS.input_type == "pointcloud" or FLAGS.input_type == "noisypc":
+                #     elif FLAGS.input_type == "pointcloud" or FLAGS.input_type == "noisypc":
 
-                        pc_KNN_idx_,pc_KNN_xyz_, voxel_xyz_int_,voxel_KNN_idx_,voxel_KNN_xyz_, gt_output_bool_,gt_output_float_,_ = data
+                #         pc_KNN_idx_,pc_KNN_xyz_, voxel_xyz_int_,voxel_KNN_idx_,voxel_KNN_xyz_, gt_output_bool_,gt_output_float_,_ = data
 
-                        pred_output_bool_numpy = np.zeros([FLAGS.grid_size+1,FLAGS.grid_size+1,FLAGS.grid_size+1,3], np.float32)
-                        pred_output_float_numpy = np.full([FLAGS.grid_size+1,FLAGS.grid_size+1,FLAGS.grid_size+1,3], 0.5, np.float32)
+                #         pred_output_bool_numpy = np.zeros([FLAGS.grid_size+1,FLAGS.grid_size+1,FLAGS.grid_size+1,3], np.float32)
+                #         pred_output_float_numpy = np.full([FLAGS.grid_size+1,FLAGS.grid_size+1,FLAGS.grid_size+1,3], 0.5, np.float32)
 
-                        pc_KNN_idx = pc_KNN_idx_[0].to(device)
-                        pc_KNN_xyz = pc_KNN_xyz_[0].to(device)
-                        voxel_xyz_int = voxel_xyz_int_[0].to(device)
-                        voxel_KNN_idx = voxel_KNN_idx_[0].to(device)
-                        voxel_KNN_xyz = voxel_KNN_xyz_[0].to(device)
+                #         pc_KNN_idx = pc_KNN_idx_[0].to(device)
+                #         pc_KNN_xyz = pc_KNN_xyz_[0].to(device)
+                #         voxel_xyz_int = voxel_xyz_int_[0].to(device)
+                #         voxel_KNN_idx = voxel_KNN_idx_[0].to(device)
+                #         voxel_KNN_xyz = voxel_KNN_xyz_[0].to(device)
 
-                        with torch.no_grad():
-                            if net_bool:
-                                pred_output_bool = network_bool(pc_KNN_idx,pc_KNN_xyz, voxel_xyz_int,voxel_KNN_idx,voxel_KNN_xyz)
-                            if net_float:
-                                pred_output_float = network_float(pc_KNN_idx,pc_KNN_xyz, voxel_xyz_int,voxel_KNN_idx,voxel_KNN_xyz)
+                #         with torch.no_grad():
+                #             if net_bool:
+                #                 pred_output_bool = network_bool(pc_KNN_idx,pc_KNN_xyz, voxel_xyz_int,voxel_KNN_idx,voxel_KNN_xyz)
+                #             if net_float:
+                #                 pred_output_float = network_float(pc_KNN_idx,pc_KNN_xyz, voxel_xyz_int,voxel_KNN_idx,voxel_KNN_xyz)
 
-                        if net_bool:
-                            pred_output_bool_ = pred_output_bool.detach().cpu().numpy()
-                        else:
-                            pred_output_bool_ = gt_output_bool_[0].numpy()
-                        if net_float:
-                            pred_output_float_ = pred_output_float.detach().cpu().numpy()
-                        else:
-                            pred_output_float_ = gt_output_float_[0].numpy()
+                #         if net_bool:
+                #             pred_output_bool_ = pred_output_bool.detach().cpu().numpy()
+                #         else:
+                #             pred_output_bool_ = gt_output_bool_[0].numpy()
+                #         if net_float:
+                #             pred_output_float_ = pred_output_float.detach().cpu().numpy()
+                #         else:
+                #             pred_output_float_ = gt_output_float_[0].numpy()
 
-                        voxel_xyz_int = voxel_xyz_int_[0].numpy()
-                        pred_output_bool_numpy[voxel_xyz_int[:,0],voxel_xyz_int[:,1],voxel_xyz_int[:,2]] = pred_output_bool_
-                        pred_output_float_numpy[voxel_xyz_int[:,0],voxel_xyz_int[:,1],voxel_xyz_int[:,2]] = pred_output_float_
+                #         voxel_xyz_int = voxel_xyz_int_[0].numpy()
+                #         pred_output_bool_numpy[voxel_xyz_int[:,0],voxel_xyz_int[:,1],voxel_xyz_int[:,2]] = pred_output_bool_
+                #         pred_output_float_numpy[voxel_xyz_int[:,0],voxel_xyz_int[:,1],voxel_xyz_int[:,2]] = pred_output_float_
 
-                        pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
+                #         pred_output_bool_numpy = (pred_output_bool_numpy>0.5).astype(np.int32)
 
 
-                    pred_output_float_numpy = np.clip(pred_output_float_numpy,0,1)
-                    if FLAGS.method == "undc":
-                        vertices, triangles = utils.dual_contouring_undc_test(pred_output_bool_numpy, pred_output_float_numpy)
-                    else:
-                        vertices, triangles = utils.dual_contouring_ndc_test(pred_output_bool_numpy, pred_output_float_numpy)
-                    utils.write_obj_triangle(FLAGS.sample_dir+"/test_"+str(i)+".obj", vertices, triangles)
+                #     pred_output_float_numpy = np.clip(pred_output_float_numpy,0,1)
+                #     if FLAGS.method == "undc":
+                #         vertices, triangles = utils.dual_contouring_undc_test(pred_output_bool_numpy, pred_output_float_numpy)
+                #     else:
+                #         vertices, triangles = utils.dual_contouring_ndc_test(pred_output_bool_numpy, pred_output_float_numpy)
+                #     utils.write_obj_triangle(FLAGS.sample_dir+"/test_"+str(i)+".obj", vertices, triangles)
 
-                    if i>=32: break
+                #     if i>=32: break
 
     elif is_testing:
         import cutils
