@@ -160,7 +160,7 @@ def get_gt_from_intersectionpn(q, name_list):
                             b[reference_V_len:reference_V_len+3] = reg_pos*reg_scale
                             x = lstsq(a,b)[0]
 
-                            # what is this branch? so no matter what it does, this should relate to the UDF
+                            # what is this branch? seems like generating the center point of each cell
                             if np.min(x)<0 or np.max(x)>1:
                                 tmp_scale = 1
                                 while np.min(x)<0 or np.max(x)>1:

@@ -5,10 +5,63 @@ import time
 
 import torch
 from tqdm import tqdm
+from PIL import Image
+from os.path import join
 
 def worker_init_fn(worker_id):
     np.random.seed(int(time.time()*10000000)%10000000 + worker_id)
 
+
+def tensor_to_png(edge_maps, idx, slice_idx, axis = 'x', save_path = "./experiment/"):
+    # let's visulize all labels along the given axis
+    # and beacause of the data augmentation and 
+    edge_maps = edge_maps.squeeze().detach().cpu().numpy()
+    _, x, y, z = edge_maps.shape
+    pngs = []
+    png_row = []
+    if axis == 'x':
+        for i in range(x):
+            edge_map = (edge_maps[slice_idx, i, :, :] != 0)
+            if i % 8 == 0 and i > 0:
+                pngs.append(np.concatenate(png_row, axis = 1))
+                png_row = [edge_map]
+            elif i == x - 1:
+                png_row.append(edge_map)
+                png_w = np.ones(edge_maps[slice_idx, i, :, :].shape, dtype = bool)
+                pngs_w = [png_w] * (8 - (i + 1) % 8)
+                pngs.append(np.concatenate(png_row + pngs_w, axis = 1))
+            else:
+                png_row.append(edge_map)    
+    elif axis == 'y':
+        for i in range(y):
+            edge_map = (edge_maps[slice_idx, :, i, :] != 0)
+            if i % 8 == 0 and i > 0:
+                pngs.append(np.concatenate(png_row, axis = 1))
+                png_row = [edge_map]
+            elif i == y - 1:
+                png_row.append(edge_map)    
+                png_w = np.ones(edge_maps[slice_idx, :, i, :].shape, dtype = bool)
+                pngs_w = [png_w] * (8 - (i + 1) % 8)
+                pngs.append(np.concatenate(png_row + pngs_w, axis = 1))
+                break
+            else:
+                png_row.append(edge_map)    
+    elif axis == 'z':
+        for i in range(z):
+            edge_map = (edge_maps[slice_idx, :, :, i] != 0)
+            if i % 8 == 0 and i > 0:
+                pngs.append(np.concatenate(png_row, axis = 1))
+                png_row = [edge_map]
+            elif i == z - 1:
+                png_row.append(edge_map)
+                png_w = np.ones(edge_maps[slice_idx, :, :, i].shape, dtype = bool)
+                pngs_w = [png_w] * (8 - (i + 1) % 8)
+                pngs.append(np.concatenate(png_row + pngs_w, axis = 1))
+                break
+            else:
+                png_row.append(edge_map)    
+    png = np.concatenate(pngs, axis = 0)
+    Image.fromarray(png).save(join(save_path, str(idx) + "_" + axis + '.png'))
 
 if __name__ == "__main__":
     __spec__ = None
@@ -170,12 +223,12 @@ if __name__ == "__main__":
             avg_acc_float_count = 0
             for i, data in tqdm(enumerate(dataloader_train, 0), total = len(dataloader_train)):
 
-                # continue
+
                 if FLAGS.input_type == "sdf" or FLAGS.input_type == "voxel" or FLAGS.input_type == "udf":
 
                     if net_bool:
                         gt_input_, gt_output_bool_, gt_output_bool_mask_ = data
-
+                        tensor_to_png(gt_output_bool_, idx = i, slice_idx = 0, axis = 'x')
                         gt_input = gt_input_.to(device)
                         gt_output_bool = gt_output_bool_.to(device)
                         gt_output_bool_mask = gt_output_bool_mask_.to(device)
@@ -529,11 +582,11 @@ if __name__ == "__main__":
                 '''
                 Chuan's code
                 '''
-                fake_input = False
+                fake_input = True
                 fake_output = False
                 if fake_input:
                     sketch = np.load('test_03.npz')
-                    gt_input = np.tile(sketch['udf'], (50, 1, 1))
+                    gt_input = np.tile(sketch['udf'], (50, 1, 1)).transpose((2,1,0))
                     y, x = sketch['edge_x'].shape
                     gt_output = np.zeros((1, 3, x - 6, y - 6, 50 - 6))
                     x_bool = np.expand_dims(sketch['edge_x'].transpose((1, 0))[3:-3, 3:-3], axis = (0, 1, -1))

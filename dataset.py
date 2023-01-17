@@ -111,6 +111,7 @@ class ABC_grid_hdf5(torch.utils.data.Dataset):
             if self.is_undc:
                 if self.input_type=="sdf" or self.input_type=="udf":
                     tmp_mask = ( (gt_input_>-1) & (gt_input_<1) )
+                    # why? what this does?
                     gt_output_bool_mask_[0,:-1,:,:] = tmp_mask[:-1,:,:] & tmp_mask[1:,:,:]
                     gt_output_bool_mask_[1,:,:-1,:] = tmp_mask[:,:-1,:] & tmp_mask[:,1:,:]
                     gt_output_bool_mask_[2,:,:,:-1] = tmp_mask[:,:,:-1] & tmp_mask[:,:,1:]

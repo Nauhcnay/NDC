@@ -1,7 +1,7 @@
 import numpy as np
 import h5py
 
-CHUAN = True
+CHUAN = False
 
 #read sdf files produced by SDFGen
 def read_sdf_file_as_3d_array(name):
@@ -291,14 +291,19 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
     #augment data
     permutation_list = [ [0,1,2], [0,2,1], [1,0,2], [1,2,0], [2,0,1], [2,1,0] ]
     reversal_list = [ [0,0,0],[0,0,1],[0,1,0],[0,1,1], [1,0,0],[1,0,1],[1,1,0],[1,1,1] ]
+    # random transpose
     if aug_permutation:
         permutation = permutation_list[np.random.randint(len(permutation_list))]
     else:
         permutation = permutation_list[0]
+    
+    # random flipping
     if aug_reversal:
         reversal = reversal_list[np.random.randint(len(reversal_list))]
     else:
         reversal = reversal_list[0]
+    
+    # random reverse the UDF value
     if aug_inversion:
         inversion_flag = np.random.randint(2)
     else:
@@ -306,7 +311,7 @@ def read_and_augment_data_undc(hdf5_dir,grid_size,input_type,out_bool,out_float,
 
 
     if reversal[0]:
-        for k in newdict: #reverse
+        for k in newdict: #reverse, this is the same as flipping
             newdict[k] = newdict[k][::-1,:,:]
         if out_float:
             k = 'float_center_x_'
