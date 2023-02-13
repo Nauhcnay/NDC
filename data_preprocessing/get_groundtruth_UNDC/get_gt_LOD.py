@@ -275,9 +275,11 @@ if __name__ == '__main__':
 
     #obj_names = ["00000016"]
 
-    fin = open("abc_obj_list.txt", 'r')
-    obj_names = [name.strip() for name in fin.readlines()]
-    fin.close()
+    # fin = open("abc_obj_list.txt", 'r')
+    # obj_names = [name.strip() for name in fin.readlines()]
+    # fin.close()
+
+    obj_names = os.listdir(target_dir)
 
     obj_names_len = len(obj_names)
 
@@ -301,7 +303,8 @@ if __name__ == '__main__':
         list_of_list_of_names.append([])
     for idx in range(obj_names_len):
         process_id = idx%num_of_process
-        in_name = target_dir + obj_names[idx] + "/model"
+        # in_name = target_dir + obj_names[idx] + "/model"
+        in_name = target_dir + obj_names[idx]
         out_name = write_dir + obj_names[idx]
 
         list_of_list_of_names[process_id].append([process_id, idx, in_name, out_name])
@@ -310,7 +313,7 @@ if __name__ == '__main__':
     '''
     Chuan: For debug and understanding this code
     '''
-    get_gt_from_intersectionpn(0, [[0, 0, 'bunny', 'bunny_out']])
+    # get_gt_from_intersectionpn(0, [[0, 0, 'bunny', 'bunny_out']])
     '''
     End of Chuan's code
     '''

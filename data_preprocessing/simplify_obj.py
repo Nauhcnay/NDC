@@ -4,12 +4,13 @@ import argparse
 
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("share_id", type=int, help="id of the share [0]")
-parser.add_argument("share_total", type=int, help="total num of shares [1]")
-FLAGS = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument("share_id", type=int, help="id of the share [0]")
+# parser.add_argument("share_total", type=int, help="total num of shares [1]")
+# FLAGS = parser.parse_args()
 
-target_dir = "../objs/"
+target_dir = "./objs/"
+save_dir = "./objs_normed/"
 if not os.path.exists(target_dir):
     print("ERROR: this dir does not exist: "+target_dir)
     exit()
@@ -17,12 +18,12 @@ if not os.path.exists(target_dir):
 obj_names = os.listdir(target_dir)
 obj_names = sorted(obj_names)
 
-share_id = FLAGS.share_id
-share_total = FLAGS.share_total
+# share_id = FLAGS.share_id
+# share_total = FLAGS.share_total
 
-start = int(share_id*len(obj_names)/share_total)
-end = int((share_id+1)*len(obj_names)/share_total)
-obj_names = obj_names[start:end]
+# start = int(share_id*len(obj_names)/share_total)
+# end = int((share_id+1)*len(obj_names)/share_total)
+# obj_names = obj_names[start:end]
 
 
 
@@ -84,15 +85,15 @@ def write_obj(dire, vertices, triangles):
 
 for i in range(len(obj_names)):
     this_subdir_name = target_dir + obj_names[i]
-    sub_names = os.listdir(this_subdir_name)
-    if len(sub_names)==0:
-        command = "rm -r "+this_subdir_name
-        os.system(command)
-        continue
+    # sub_names = os.listdir(this_subdir_name)
+    # if len(sub_names)==0:
+    #     command = "rm -r "+this_subdir_name
+    #     os.system(command)
+    #     continue
 
-    this_name = this_subdir_name+"/"+sub_names[0]
-    out_name = this_subdir_name+"/model.obj"
+    # this_name = this_subdir_name+"/"+sub_names[0]
+    out_name = save_dir+"/%05d.obj"%i
 
-    print(i,this_name)
-    v,t = load_obj(this_name)
+    print(i,this_subdir_name)
+    v,t = load_obj(this_subdir_name)
     write_obj(out_name, v,t)

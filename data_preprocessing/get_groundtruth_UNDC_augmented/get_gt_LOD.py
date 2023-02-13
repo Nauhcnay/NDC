@@ -48,6 +48,7 @@ def get_gt_from_intersectionpn(q, name_list):
         in_name = name_list[nid][2]
         out_name = name_list[nid][3]
 
+        # in_obj_name = in_name + ".obj"
         in_obj_name = in_name + ".obj"
         in_intersection_name = in_name + ".intersectionpn"
         out_hdf5_name = out_name + ".hdf5"
@@ -83,7 +84,6 @@ def get_gt_from_intersectionpn(q, name_list):
         #prepare arrays to store ground truth
         LOD_gt_tmp_int = np.full([grid_size_1,grid_size_1,grid_size_1,num_of_int_params], 0, np.uint8)
         LOD_gt_tmp_float = np.full([grid_size_1,grid_size_1,grid_size_1,num_of_float_params], -10, np.float32)
-
 
         # ----- get_gt -----
         for i in range(grid_size):
@@ -199,7 +199,7 @@ def get_gt_from_intersectionpn(q, name_list):
 
 if __name__ == '__main__':
 
-    target_dir = "../objs/"
+    target_dir = "../objs_normed/"
     if not os.path.exists(target_dir):
         print("ERROR: this dir does not exist: "+target_dir)
         exit()
@@ -239,8 +239,9 @@ if __name__ == '__main__':
         list_of_list_of_names.append([])
     for idx in range(obj_names_len):
         process_id = idx%num_of_process
-        in_name = target_dir + obj_names[idx] + "/model"
-        out_name = write_dir + obj_names[idx]
+        # in_name = target_dir + obj_names[idx] + "/model"
+        in_name = target_dir + obj_names[idx].replace(".obj",'')
+        out_name = write_dir + obj_names[idx].replace(".obj",'')
 
         list_of_list_of_names[process_id].append([process_id, idx, in_name, out_name])
 
