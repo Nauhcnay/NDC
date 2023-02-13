@@ -304,8 +304,8 @@ if __name__ == '__main__':
     for idx in range(obj_names_len):
         process_id = idx%num_of_process
         # in_name = target_dir + obj_names[idx] + "/model"
-        in_name = target_dir + obj_names[idx]
-        out_name = write_dir + obj_names[idx]
+        in_name = target_dir + obj_names[idx].replace(".obj", "")
+        out_name = write_dir + obj_names[idx].replace(".obj", "")
 
         list_of_list_of_names[process_id].append([process_id, idx, in_name, out_name])
 
